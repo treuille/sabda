@@ -2,6 +2,16 @@
 
 Playground repo to explore AI + realtime sound generation
 
+## Project Planning
+
+### Objectives
+
+### Tech Stack
+
+### Todo
+
+- [ ]
+
 ## Usage
 
 ```bash
