@@ -11,6 +11,9 @@ const App: Component = () => {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
+        <p>
+          This is the beginning of a <i>new</i> app by Adrien Treuille
+        </p>
         <a
           class={styles.link}
           href="https://github.com/solidjs/solid"
