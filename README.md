@@ -59,6 +59,13 @@ Playground repo to explore AI + realtime sound generation
   - What are the magical moments that are key to this technology
   - What are the greatest technical hurdles that I should be able to overcome
 
+#### Observations
+
+- Honestly, SolidJS is like a more compicated React
+  - ...and probably in ways that don't matter to much to me
+  - OTOH, I like how it's built out of pure, basic typescript idioms
+    - ...and doesn't have a compiler or anything fancy like that
+
 ## Usage
 
 ```bash

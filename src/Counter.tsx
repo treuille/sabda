@@ -1,43 +1,97 @@
 import type { Component } from "solid-js";
-import { createSignal, createEffect } from "solid-js";
+import {
+  createContext,
+  useContext,
+  createSignal,
+  //createEffect,
+} from "solid-js";
 
 // import logo from "./logo.svg";
 // import styles from "./App.module.css";
-
 type CounterProps = {
   initialCount?: number;
 };
 
-const Counter: Component<CounterProps> = (props) => {
-  const [count, setCount] = createSignal(props.initialCount || 0);
-  const increment = () => {
-    console.log(`increment (before): ${count()}`);
-    setCount((prev) => {
-      console.log(`increment (prev): ${prev}`);
-      return prev + 1;
-    });
-    console.log(`increment (after): ${count()}`);
-  };
+type MyContextType = {
+  count: () => number; // Signal getter for count
+  setCount: (value: number) => void; // Signal setter for count
+};
 
-  (() => {
-    let effectCount = 0;
-    createEffect(() => {
-      effectCount++;
-      console.log(`effect called: ${effectCount} times`);
-      if (effectCount > 0) {
-        console.log(`count (effect): ${count()}`);
-      }
-    });
-  })();
+const MyContext = createContext<MyContextType | null>(); // es-lint-disable-line no-unused-vars
+
+const CounterLabel: Component = () => {
+  const context = useContext(MyContext);
+  if (!context) {
+    throw new Error("CounterLabel must be used within a Counter");
+  }
+
+  const { count, setCount: _ } = context;
 
   return (
     <div>
-      <div>Count {count()}</div>
-      <div>
-        <button type="button" onClick={increment}>
-          Increment
-        </button>
-      </div>
+      Counter Label: <code>{count()}</code>
+    </div>
+  );
+};
+
+const CounterButton: Component = () => {
+  const context = useContext(MyContext);
+  if (!context) {
+    throw new Error("CounterButton must be used within a Counter");
+  }
+
+  const { setCount } = context;
+
+  console.log(`context: ${context}`);
+  console.log(context);
+  console.log(`setCount: ${setCount}`);
+
+  return (
+    <button type="button" onClick={() => setCount((prev) => prev + 1)}>
+      Increment
+    </button>
+  );
+};
+
+const Counter: Component<CounterProps> = () => {
+  //const [count, setCount] = createSignal(props.initialCount || 0);
+  //const increment = () => {
+  //  console.log(`increment (before): ${count()}`);
+  //  setCount((prev) => {
+  //    console.log(`increment (prev): ${prev}`);
+  //    return prev + 1;
+  //  });
+  //  console.log(`increment (after): ${count()}`);
+  //};
+  //
+  //(() => {
+  //  let effectCount = 0;
+  //  createEffect(() => {
+  //    effectCount++;
+  //    console.log(`effect called: ${effectCount} times`);
+  //    if (effectCount > 0) {
+  //      console.log(`count (effect): ${count()}`);
+  //    }
+  //  });
+  //})();
+
+  //<div>Count {count()}</div>
+  //<div>
+  //  <button type="button" onClick={increment}>
+  //    Increment
+  //  </button>
+  //</div>
+
+  const [count, setCount] = createSignal(0);
+  const value = { count, setCount };
+
+  return (
+    <div>
+      <MyContext.Provider value={value}>
+        <CounterLabel />
+        <CounterLabel />
+        <CounterButton />
+      </MyContext.Provider>
     </div>
   );
 };
