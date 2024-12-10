@@ -37,10 +37,8 @@ Playground repo to explore AI + realtime sound generation
 
 - [ ] Basic learning.. do 1 hr of learning SolidJS
   - [x] Build a simple counter app
-  - [ ] Do a test with this context thing?
+  - [x] Do a test with this context thing?
     - Two counters with renderers and increment buttons
-  - [ ] Do a test with this state thing
-    - Two counters with renderers and increment buttons, but with state?
 - [x] Lunch? :)
 - [ ] Figure Investigate ToneJS
   - [ ] When you press a button, the browser plays a sound
@@ -53,11 +51,13 @@ Playground repo to explore AI + realtime sound generation
 
 #### When feeling bored
 
-- [ ] Lunch ;)
+- [x] Lunch ;)
 - [ ] Finish weekly planning
 - [ ] Strategic thinking for this project
   - What are the magical moments that are key to this technology
   - What are the greatest technical hurdles that I should be able to overcome
+- [ ] Do a test with this state thing
+  - Two counters with renderers and increment buttons, but with state?
 
 #### Observations
 
