@@ -2,35 +2,20 @@
 
 Playground repo to explore AI + realtime sound generation
 
-## Usage
+## Todo
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+- Test writing a rust function that runs natively in MacOS
+    - Write a hello world
+    - See if I can run it natively in MacOS
+- See if I can copy that cargo project
+    - See if I can get that one ot run natively
 
-## Available Scripts
+## Branches
 
-In the project directory, you can run:
+This project is organized into several branches.
 
-### `npm run dev` or `npm start`
+| branch          | meaning                                   |
+|-----------------|-------------------------------------------|
+| `main`          | Right now, vst3                           |
+| `solid_js`      | A test of creating sound using SolidJs    |
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-
-### `npm run build`
-
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
-
-## Acknowledgements
-
-This project was created with the [Solid CLI](https://solid-cli.netlify.app)
