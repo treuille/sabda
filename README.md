@@ -88,12 +88,3 @@ Then I had so move `MacOSX15.1.sdk` into the container with this command
 tar -cvf - /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk | ssh adrien@test-4 'tar -xvf - -C /home/adrien/.local/zig-linux-aarch64-0.13.0/lib/libc/macos'
 ```
 
-## Branches
-
-This project is organized into several branches.
-
-| branch          | meaning                                   |
-|-----------------|-------------------------------------------|
-| `main`          | Right now, vst3                           |
-| `solid_js`      | A test of creating sound using SolidJs    |
-
