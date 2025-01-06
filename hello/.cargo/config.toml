@@ -1,0 +1,8 @@
+# According to Claude, the linker configuration must stay in `.cargo/config.toml`.
+# This is a limitation of Cargo's configuration system.
+[target.aarch64-apple-darwin]
+linker = "./zig-linker.sh"
+rustflags = [
+    "-C", "debuginfo=0",
+    "-C", "split-debuginfo=off"
+]

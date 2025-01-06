@@ -1,0 +1,15 @@
+[package]
+name = "hello"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "hello"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2.169"
+
+[target.aarch64-apple-darwin]
+linker = "./zig-linker.sh"
+rustflags = ["-C", "debuginfo=0", "-C", "split-debuginfo=off"]
