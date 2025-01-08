@@ -4,19 +4,30 @@ Playground repo to explore AI + realtime sound generation
 
 ## Todo
 
-- Clean out everything I can abou the current setup
-    - Get rid of the JSON file?
-    - Move the code at the bottom somewhere?
-    - Look for any additional stray files I can get rid of
-- Commit the current setup into git
-    - At first do it in main
-    - Then move it to its own branch.
-    - Make main simply point to the branches
-    - See if I can see it render properly inside of the Github site
-- Start to follow the instructions to create an example plugin in Rust
-    - See if I can build it first locally on my computer
-    - Then see if I can build it for mac
-    - See if I can open it in Ableton
+- Write the vision statement
+    - Write down the risks
+    - Categorize the risks
+    - Rank order the risks
+- Start to create todo list based on burning down the single biggest risk
+
+## Vision
+
+- See if we can get a neural net running in Ableton which lets you generate audio
+- We want to trigger the plugin to play the audio every n midi steps if we can
+
+### Risks (unordered)
+
+- I don't know how to see if there are any voice generation neural nets in hugging face
+    - Or should I look for something commerical
+- I don't know if I can run a neural net in Rust
+- I can't play a sample using nih-plug
+- I don't know how to read the midi clock in nih-plug
+- I don't unerstand how nih-plug works
+    - There is no good documentation for nih-plug
+- I don't have a way of debugging nih-plug
+
+### Later
+
 - See if I can make this setup reproducible (that is: work in a new container)
 
 ## Building the project
@@ -26,17 +37,16 @@ To build the project with cargo build run
 To build the project:
 
 ```bash
-# For M1/M2 Macs (Apple Silicon)
-cargo build --release --target aarch64-apple-darwin
+# Debug mode for M1/M2 Macs (Apple Silicon)
+cargo build --target aarch64-apple-darwin
 
-# For Intel Macs
-cargo build --release --target x86_64-apple-darwin
-```
+# Release mode for M1/M2 Macs (Apple Silicon)
+cargo build --release --target aarch64-apple-darwin
+``catppuccin`
 
 The executable will be in:
 
 - `target/aarch64-apple-darwin/release/hello` (for M1/M2)
-- `target/x86_64-apple-darwin/release/hello` (for Intel)
 
 ## Installation for MacOS
 
