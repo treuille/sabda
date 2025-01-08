@@ -7,9 +7,5 @@ edition = "2021"
 name = "hello"
 path = "src/main.rs"
 
-[dependencies]
-libc = "0.2.169"
-
-[target.aarch64-apple-darwin]
-linker = "./zig-linker.sh"
-rustflags = ["-C", "debuginfo=0", "-C", "split-debuginfo=off"]
+# [dependencies]
+# libc = "0.2.169"
