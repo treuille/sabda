@@ -6,46 +6,40 @@ Testing neural network sound generation in Python
 
 ## Installation instructions
 
-Make sure the Python develpment headers are installed.
+**Important:** `fairseq` requires Python <= 3.10, as well as an older
+version of `pip`, hence the following build steps:
 
-```bash
-sudo apt-get update
-sudo apt-get install python3.12-dev
+```sh
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install -y python3.10 python3.10-dev
+sudo apt install -y python3.10-venv python3.10-distutils
+
+# Verify the Python installation
+python3.10 --version
 ```
 
-### Optional
+Install the virtual environment, and ensure an older version of pip
 
-Let's also update your requirements.txt to be more specific about versions and add some build dependencies:
+```sh
+python3.10 -m venv .venv ; venv-activate
+pip install -r dev_requirements.txt
 
-Filepath: requirements.txt
-Replace lines: 1-10
-```requirements
-# Streamlit
-streamlit
-watchdog
-
-# Build dependencies
-setuptools>=41.0.0
-wheel>=0.35.0
-
-# Neural net stuff
---find-links https://download.pytorch.org/whl/torch_stable.html
-torch>=1.9.0
-fairseq>=0.12.0
-
-# Sound output
-soundfile>=0.10.3
+# Verify the pip installation
+pip --version
 ```
 
-After installing python3.12-dev, try these steps:
-1. Remove your virtual environment and create a new one
-2. Upgrade pip: `pip install --upgrade pip`
-3. Install the requirements again: `pip install -r requirements.txt`
+Now install everything else:
+
+```sh
+pip install -r requirements.txt
+```
+
+### TODO: I think the following instructions are unnecessary
 
 If you're still having issues, you might need to install additional system dependencies:
 ```bash
 sudo apt-get install build-essential
 sudo apt-get install libsndfile1
 ```
-
 
