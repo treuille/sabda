@@ -255,6 +255,101 @@ def export_models():
     st.warning(f"This is where it's going to be saved: `{filename}`")
 
 
+def visualize_weights():
+    """Visualize the weights of different layers in the model."""
+    task, model, generator = model_util.load_task_model_generator()
+
+    # Helper function to normalize weights for visualization
+    def normalize_weights(weights):
+        weights = weights.detach().cpu().numpy()
+        min_val = weights.min()
+        max_val = weights.max()
+        normalized = (weights - min_val) * 255 / (max_val - min_val)
+        return normalized.astype("uint8")
+
+    # Get all named parameters
+    named_params = [
+        (name, param) for name, param in model.named_parameters() if param.dim() >= 2
+    ]
+    layer_names = [name for name, _ in named_params]
+
+    # Create selectbox for layer selection
+    selected_layer = st.selectbox("Select layer to visualize:", layer_names)
+
+    # Get the selected weights
+    selected_weights = dict(named_params)[selected_layer]
+
+    # Display layer info
+    st.write(f"Layer shape: {selected_weights.shape}")
+
+    # Normalize and visualize the weights
+    weights_norm = normalize_weights(selected_weights)
+
+    # Handle different dimensional tensors
+    if len(weights_norm.shape) == 2:
+        # For 2D tensors, show directly
+        st.image(
+            weights_norm,
+            caption=f"Weights visualization for {selected_layer}",
+            use_container_width=True,
+        )
+
+    elif len(weights_norm.shape) == 3:
+        # For 3D tensors, show slices
+        dim_to_slice = st.selectbox(
+            "Select dimension to slice:", range(weights_norm.shape[0])
+        )
+        st.image(
+            weights_norm[dim_to_slice],
+            caption=f"Slice {dim_to_slice} of {selected_layer}",
+            use_container_width=True,
+        )
+
+    elif len(weights_norm.shape) == 4:
+        # For 4D tensors (like conv layers), show multiple slices
+        dim1_to_slice = st.selectbox(
+            "Select first dimension to slice:", range(weights_norm.shape[0])
+        )
+        dim2_to_slice = st.selectbox(
+            "Select second dimension to slice:", range(weights_norm.shape[1])
+        )
+        st.image(
+            weights_norm[dim1_to_slice, dim2_to_slice],
+            caption=f"Slice [{dim1_to_slice}, {dim2_to_slice}] of {selected_layer}",
+            use_container_width=True,
+        )
+
+    import altair as alt
+    import pandas as pd
+    import numpy as np
+
+    # Convert weights to pandas DataFrame
+    hist_data = selected_weights.detach().cpu().numpy().flatten()
+    df = pd.DataFrame({"weights": hist_data})
+
+    # Create histogram using Altair
+    chart = (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            alt.X("weights", bin=alt.Bin(maxbins=50), title="Weight Value"),
+            alt.Y("count()", title="Count"),
+            tooltip=["count()"],
+        )
+        .properties(title="Weight Distribution", width=600, height=400)
+    )
+
+    # Add a line for the mean
+    mean_line = (
+        alt.Chart(df)
+        .mark_rule(color="red")
+        .encode(x="mean(weights)", size=alt.value(2), tooltip=["mean(weights)"])
+    )
+
+    # Combine histogram and mean line
+    st.altair_chart(chart + mean_line, use_container_width=True)
+
+
 def main():
     # Create a bunch of pages and the first one of which is to generate text
     generate_audio_page = st.Page(
@@ -263,9 +358,14 @@ def main():
     generate_audio_page_2 = st.Page(
         export_models, title="Export models", icon=":material/save:"
     )
+    visualize_weights_page = st.Page(
+        visualize_weights, title="Visualize Weights", icon=":material/visibility:"
+    )
     # delete_page = st.Page("delete.py", title="Delete entry", icon=":material/delete:")
 
-    pg = st.navigation([generate_audio_page, generate_audio_page_2])
+    pg = st.navigation(
+        [generate_audio_page, generate_audio_page_2, visualize_weights_page]
+    )
     pg.run()
 
 
