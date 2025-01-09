@@ -7,14 +7,8 @@ st.title("Text-to-Speech with Fairseq")
 
 def generate_audio():
     """This is the default page which loads the model and generates speech."""
-    # Step 1: Load the model
+    # Load the model
     task, model, generator = model_util.load_task_model_generator()
-
-    with st.expander("model"):
-        st.write(model)
-
-    with st.expander("task"):
-        model_util.display_task(task)
 
     # Step 2: Define the input text
     input_text = st.text_input(
@@ -33,17 +27,241 @@ def generate_audio():
         st.success(f"Generated speech saved to {output_file}")
 
 
-def generate_audio_2():
-    generate_audio()
+def export_models():
+    """This is the page where we can save the models to ONNX."""
+    # Load the model
+    task, model, generator = model_util.load_task_model_generator()
+
+    with st.expander("model"):
+        st.write(model)
+
+    with st.expander("task"):
+        model_util.display_task(task)
+
+    with st.expander("generator"):
+        st.write(generator)
+
+    def export_model_to_onnx(model, task, filename):
+        # TODO: Move this to model_util.py
+        import torch
+        from fairseq.models.text_to_speech.hub_interface import TTSHubInterface
+
+        # Set model to evaluation mode
+        model.eval()
+
+        # Debug model configuration
+        with st.expander("Model Configuration"):
+            st.write("Encoder Configuration:")
+
+            # Get all attributes of the encoder
+            encoder_attrs = dir(model.encoder)
+            st.write("All encoder attributes:", encoder_attrs)
+
+            # Get all non-private attributes and their values
+            encoder_public_attrs = {
+                attr: getattr(model.encoder, attr)
+                for attr in encoder_attrs
+                if not attr.startswith("_")
+            }
+            st.write("Public encoder attributes and values:", encoder_public_attrs)
+
+            # Original configuration info
+            st.write(
+                "Original Configuration:",
+                {
+                    "embed_dim": model.encoder.embed_tokens.embedding_dim,
+                    "padding_idx": model.encoder.embed_tokens.padding_idx,
+                    "pos_embed_dim": (
+                        model.encoder.embed_positions.embedding_dim
+                        if hasattr(model.encoder, "embed_positions")
+                        else None
+                    ),
+                    "num_embeddings": model.encoder.embed_tokens.num_embeddings,
+                },
+            )
+
+        # Dummy input for export
+        sample_text = "Hello, this is a test."
+        st.write(f"Sample text len: {len(sample_text)}")
+        sample = TTSHubInterface.get_model_input(task, sample_text)
+
+        with st.expander("Sample Details"):
+            st.write(
+                {
+                    "Raw sample": sample,
+                    "Net input keys": sample["net_input"].keys(),
+                    "Token shape": (
+                        sample["net_input"]["src_tokens"].shape
+                        if isinstance(sample["net_input"]["src_tokens"], torch.Tensor)
+                        else None
+                    ),
+                    "Length shape": (
+                        sample["net_input"]["src_lengths"].shape
+                        if isinstance(sample["net_input"]["src_lengths"], torch.Tensor)
+                        else None
+                    ),
+                }
+            )
+
+        # Get both required inputs
+        tokens = sample["net_input"]["src_tokens"]
+        lengths = sample["net_input"]["src_lengths"]
+
+        # Add batch dimension to both inputs and ensure they're on the same device as model
+        dummy_tokens = (
+            torch.tensor(tokens).unsqueeze(0).to(next(model.parameters()).device)
+        )
+        dummy_lengths = (
+            torch.tensor(lengths).unsqueeze(0).to(next(model.parameters()).device)
+        )
+
+        with st.expander("Tensor Dimensions"):
+            st.write(
+                {
+                    "tokens_shape": dummy_tokens.shape,
+                    "lengths_shape": dummy_lengths.shape,
+                    "device": str(dummy_tokens.device),
+                    "tokens_dtype": str(dummy_tokens.dtype),
+                    "lengths_dtype": str(dummy_lengths.dtype),
+                    "tokens_min_max": (
+                        dummy_tokens.min().item(),
+                        dummy_tokens.max().item(),
+                    ),
+                }
+            )
+
+        # Try a test forward pass
+        with st.expander("Test Forward Pass"):
+            try:
+                with torch.no_grad():
+                    # Get encoder embedding dimensions
+                    token_embedding = model.encoder.embed_tokens(dummy_tokens)
+                    st.write(
+                        {
+                            "token_embedding_shape": token_embedding.shape,
+                            "expected_pos_embed_shape": (
+                                dummy_tokens.size(0),
+                                dummy_tokens.size(1),
+                                model.encoder.embed_tokens.embedding_dim,
+                            ),
+                        }
+                    )
+
+                    # Try to get positional embedding shape
+                    if hasattr(model.encoder, "embed_positions"):
+                        enc_padding_mask = dummy_tokens.eq(model.encoder.padding_idx)
+                        pos_embed = model.encoder.embed_positions(enc_padding_mask)
+
+                        # Reshape positional embedding to match token embedding
+                        pos_embed = pos_embed.view(1, 1, 16, 256)
+
+                        st.write(
+                            {
+                                "original_pos_embedding_shape": (1, 1, 16 * 256),
+                                "reshaped_pos_embedding_shape": pos_embed.shape,
+                                "padding_mask_shape": enc_padding_mask.shape,
+                            }
+                        )
+
+                        # Test the addition
+                        combined = token_embedding + pos_embed
+                        st.write({"combined_shape": combined.shape})
+            except Exception as e:
+                st.error(f"Forward pass error: {str(e)}")
+
+        # Create a wrapper class to handle the reshaping
+        class ModelWrapper(torch.nn.Module):
+            def __init__(self, model):
+                super().__init__()
+                self.model = model
+
+            def forward(self, src_tokens, src_lengths):
+                # Override the encoder's forward method temporarily
+                original_forward = self.model.encoder.forward
+
+                def new_forward(self, src_tokens, src_lengths, **kwargs):
+                    x = self.embed_tokens(src_tokens)
+                    enc_padding_mask = src_tokens.eq(self.padding_idx)
+
+                    # Get positional embeddings and reshape them
+                    pos_embed = self.embed_positions(enc_padding_mask)
+                    pos_embed = pos_embed.view(*x.size())  # Reshape to match x
+
+                    x += self.pos_emb_alpha * pos_embed
+
+                    # Apply dropout
+                    x = self.dropout_module(x)
+
+                    # Transpose for attention layers
+                    x = x.transpose(0, 1)  # [B, T, D] -> [T, B, D]
+
+                    # Transformer layers
+                    for layer in self.encoder_fft_layers:
+                        x = layer(x, enc_padding_mask)
+
+                    # Transpose back
+                    x = x.transpose(0, 1)  # [T, B, D] -> [B, T, D]
+
+                    # Apply layer norm if it exists
+                    if self.layer_norm is not None:
+                        x = self.layer_norm(x)
+                    return {
+                        "encoder_out": x,  # B x T x C
+                        "encoder_padding_mask": enc_padding_mask,  # B x T
+                        "encoder_embedding": None,
+                        "encoder_states": None,
+                        "src_tokens": None,
+                        "src_lengths": None,
+                    }
+
+                # Replace the forward method
+                self.model.encoder.forward = new_forward.__get__(self.model.encoder)
+
+                try:
+                    # Get the output
+                    encoder_out = self.model.encoder(src_tokens, src_lengths)
+                finally:
+                    # Restore the original forward method
+                    self.model.encoder.forward = original_forward
+
+                return encoder_out
+
+        # Wrap the model
+        wrapped_model = ModelWrapper(model)
+
+        # Export to ONNX with both required inputs
+        if st.button("Export to ONNX"):
+            with torch.no_grad():
+                torch.onnx.export(
+                    wrapped_model,
+                    (dummy_tokens, dummy_lengths),  # Pass both inputs as a tuple
+                    filename,
+                    export_params=True,
+                    opset_version=12,
+                    input_names=["src_tokens", "src_lengths"],
+                    output_names=["encoder_out", "encoder_padding_mask"],
+                    dynamic_axes={
+                        "src_tokens": {0: "batch_size", 1: "sequence_length"},
+                        "src_lengths": {0: "batch_size"},
+                        "encoder_out": {0: "batch_size", 1: "sequence_length"},
+                        "encoder_padding_mask": {0: "batch_size", 1: "sequence_length"},
+                    },
+                    do_constant_folding=True,
+                )
+            st.success(f"FastSpeech2 exported to ONNX: {filename}")
+
+    filename = "fastspeech2.onnx"
+    export_model_to_onnx(model, task, filename)
+    st.warning(f"This is where it's going to be saved: `{filename}`")
 
 
 def main():
     # Create a bunch of pages and the first one of which is to generate text
     generate_audio_page = st.Page(
-        generate_audio, title="Generate audio", icon=":material/add_circle:"
+        generate_audio, title="Generate audio", icon=":material/volume_up:"
     )
     generate_audio_page_2 = st.Page(
-        generate_audio_2, title="Generate audio 2", icon=":material/add_circle:"
+        export_models, title="Export models", icon=":material/save:"
     )
     # delete_page = st.Page("delete.py", title="Delete entry", icon=":material/delete:")
 
