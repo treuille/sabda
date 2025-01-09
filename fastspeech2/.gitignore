@@ -3,3 +3,6 @@
 
 # The Python module cache
 __pycache__/
+
+# The output wav files that we generate
+output.wav
