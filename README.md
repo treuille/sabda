@@ -4,12 +4,30 @@ Playground repo to explore AI + realtime sound generation
 
 ## Todo
 
+- See if I can get Kokoro-82M to play properly
+    - Project management
+        - Start to write a README of
+    - Python side
+        - Can I use the python install?
+        - Can I use the onnx install?
+        - Can I create some test vectors in Pythoin
+    - Rust side
+        - Can I ask the LLM to translate the Python code into rust code
+        - Can I compile it using my previous toolchain into an executable to run on mac
+- See if I can inject a fixed set of samples (wav) into the vst3 plugin architecture
+- Can I compile the onnx code as a plugin for Ableton
 - Add effects to it? <- Fun!
 
 ## Vision
 
 - See if we can get a neural net running in Ableton which lets you generate audio
 - We want to trigger the plugin to play the audio every n midi steps if we can
+
+### Observations
+
+- It's really easy to get these models running in Python
+    - But it's hard to get them to compile to Rust
+    - All the computation to encode / decode inputs and outputs will need to be ported.
 
 ### Risks (unordered)
 
