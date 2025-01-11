@@ -19,7 +19,13 @@ of the Ableton exploration project
 Then copy the big files over
 
 ```sh
+# The pth model itself
 cp Kokoro-82M/kokoro-v0_19.pth .
+
+# Alternatively,this is the onnx representation of the model
+cp Kokoro-82M/kokoro-v0_19.onnx .
+
+# The voice pack
 cp -r Kokoro-82M/voices .
 ```
 

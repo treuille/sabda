@@ -10,3 +10,4 @@ Kokoro-82M/
 # All the model files
 **/*.pt
 **/*.pth
+**/*.onnx

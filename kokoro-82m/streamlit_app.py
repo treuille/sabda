@@ -1,5 +1,6 @@
 import streamlit as st
 import torch
+import numpy as np
 
 
 @st.cache_resource
@@ -25,19 +26,28 @@ def load_voice_pack(voice_name, device):
     return torch.load(f"voices/{voice_name}.pt", weights_only=True).to(device)
 
 
-def script_1():
+@st.cache_resource
+def load_inference_session(model_path):
+    from onnxruntime import InferenceSession
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    st.write("cuda is available:", torch.cuda.is_available())
-    st.write("device:", device)
+    return InferenceSession(model_path)
 
-    # TODO: Rename to `model` and `voicepack`
-    model_path = "kokoro-v0_19.pth"
-    model = build_model(model_path, device)
-    st.success(f"Model loaded successfully `{model_path}`")
-    with st.expander("Model details"):
-        st.write(model)
 
+@st.cache_data
+def get_tokens(text, voice_name):
+    from kokoro import phonemize, tokenize
+
+    # Language is determined by the first letter of the VOICE_NAME:
+    # [US] 'a' => American English => en-us
+    # [UK] 'b' => British English => en-gb
+    lang = voice_name[0]
+    ps = phonemize(text, lang)
+    tokens = tokenize(ps)
+    return tokens
+
+
+def get_voice_name():
+    """Gives the user the option to select a voice."""
     voice_options = [
         "af",  # Default voice is a 50-50 mix of Bella & Sarah
         "af_bella",
@@ -56,6 +66,23 @@ def script_1():
         options=voice_options,
         help="af = American Female (Bella & Sarah mix), am = American Male, bf = British Female, bm = British Male",
     )
+    return voice_name
+
+
+def run_pth_model():
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    st.write("cuda is available:", torch.cuda.is_available())
+    st.write("device:", device)
+
+    # TODO: Rename to `model` and `voicepack`
+    model_path = "kokoro-v0_19.pth"
+    model = build_model(model_path, device)
+    st.success(f"Model loaded successfully `{model_path}`")
+    with st.expander("Model details"):
+        st.write(model)
+
+    voice_name = get_voice_name()
     voice_pack = load_voice_pack(voice_name, device)
     st.success(f"Voice pack loaded successfully `{voice_name}`")
     with st.expander("Voice pack details"):
@@ -71,6 +98,49 @@ def script_1():
     st.write("Output phonemes:", out_ps)
 
 
-if __name__ == "__main__":
+def run_onnx_model():
+    """Run the model, this time using onnx."""
+    # !pip install onnxruntime
+
+    # Tokens produced by phonemize() and tokenize() in kokoro.py
+    voice_name = get_voice_name()
+    default_text = "How could I know? It's an unanswerable question. Like asking an unborn child if they'll lead a good life. They haven't even been born."
+    text = st.text_input("Enter text", default_text)
+    tokens = get_tokens(text, voice_name)
+    st.write(f"There are `{len(tokens)}` tokens")
+
+    # Context length is 512, but leave room for the pad token 0 at the start & end
+    assert len(tokens) <= 510, len(tokens)
+
+    # Style vector based on len(tokens), ref_s has shape (1, 256)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    voice_pack = load_voice_pack(voice_name, device)
+    ref_s = voice_pack[len(tokens)].numpy()
+
+    # Add the pad ids, and reshape tokens, should now have shape (1, <=512)
+    tokens = [[0, *tokens, 0]]
+
+    sess = load_inference_session("kokoro-v0_19.onnx")
+
+    audio = sess.run(
+        None, dict(tokens=tokens, style=ref_s, speed=np.ones(1, dtype=np.float32))
+    )[0]
+
+    st.audio(audio, sample_rate=24000)
+
+    st.success("Audio successfully generated!")
+
+
+def main():
+    """Execution starts here."""
     st.title("Kokoro")
-    script_1()
+    st.navigation(
+        [
+            st.Page(run_pth_model, title="Run PTH Model", icon=":material/volume_up:"),
+            st.Page(run_onnx_model, title="Run ONNX Model", icon=":material/save:"),
+        ]
+    ).run()
+
+
+if __name__ == "__main__":
+    main()

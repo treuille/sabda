@@ -9,6 +9,9 @@ transformers
 scipy
 munch
 
+# kokoro requirements to run the ONNX model
+onnxruntime
+
 # # Interaction with Huggingface
 # huggingface_hub
 #
