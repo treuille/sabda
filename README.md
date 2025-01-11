@@ -4,11 +4,7 @@ Playground repo to explore AI + realtime sound generation
 
 ## Todo
 
-- Write the vision statement
-    - Write down the risks
-    - Categorize the risks
-    - Rank order the risks
-- Start to create todo list based on burning down the single biggest risk
+- Add effects to it? <- Fun!
 
 ## Vision
 
@@ -17,10 +13,9 @@ Playground repo to explore AI + realtime sound generation
 
 ### Risks (unordered)
 
-- I don't know how to see if there are any voice generation neural nets in hugging face
-    - Or should I look for something commerical
-- I don't know if I can run a neural net in Rust
+- Can I run a neural net in Rust?
 - I can't play a sample using nih-plug
+- I don't know if I can run a neural net in Rust
 - I don't know how to read the midi clock in nih-plug
 - I don't unerstand how nih-plug works
     - There is no good documentation for nih-plug
