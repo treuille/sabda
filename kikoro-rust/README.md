@@ -6,10 +6,6 @@ This is a simple command-line script which takes a sentence and runs the Kokoro 
 
 ### Milestone 1 (Can I get the neural net loaded as a separate project?)
 
-- Clean up the git stuff
-    - .gitignore everything I can
-    - commit the rest
-
 - Copy the correct onnx file over
     - ...and maybe that's a good place to leave things
 

@@ -3,7 +3,8 @@ use ort::session::{builder::GraphOptimizationLevel, Session};
 fn main() -> ort::error::Result<()> {
     println!("Hello, Adrien!");
 
-    let model_path = "yolov8m.onnx";
+    //let model_path = "yolov8m.onnx";
+    let model_path = "kokoro-v0_19.onnx";
     let model = Session::builder()?
         .with_optimization_level(GraphOptimizationLevel::Level3)?
         .with_intra_threads(4)?

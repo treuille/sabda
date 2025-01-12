@@ -1,2 +1,5 @@
 # Rust build directory
 target/
+
+# Any build models
+**/*.onnx
