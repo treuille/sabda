@@ -14,18 +14,23 @@ Playground repo to explore AI + realtime sound generation
 
 - Rust side (just ONNX for now)
     - **Goal:** Can I get the neural net loaded as a separate project?
-        - Read through the `ort` documentation
-        - Look through the `ort` examples
-        - Create the separate project
+        - [x] Read through the `ort` documentation
+        - [x] Look through the `ort` examples
+        - [x] Create the separate project
+        - [ ] Get hello world to run
+        - [ ] Get `ort` compiled in
+        - [ ] Can I printf some kind of version information?
+        - [ ] Can I in principle load in that model
+        - [ ] Can I run it quickly
     - **Goal:** an I output a wav file based on command line arguments?
 - Rust side (plug-in)
+    - First, create my own sinusoidal (or something else?) plug-in (outside `nih-plug`)
+    - Clean up git
     - Can I plug in the ONNX runtime into the plugin j
-    -
 - Rust side
     - ???
 - Combining Rust + Python
     - See if I can get some vectors in there
-
 - See if I can get Kokoro-82M to play properly
     - Anything more to add here?
 - Go through the risks below .. **which have I resolved??**
@@ -65,6 +70,12 @@ Playground repo to explore AI + realtime sound generation
 
 ## Risks (unordered)
 
+- **TBH** There's a lot of plumbing (and exploring!) "risk" here..
+    - what about **artistic risk?**
+    - would that affect greatly what I'm working on right now
+    - *In principle, wouldn't it better shape my tehcnical explorations to have
+      a clearer sense of what I might want to expolore technically?* (Short guess:
+      yes)
 - Can I run a neural net in Rust?
 - I can't play a sample using nih-plug
 - I don't know if I can run a neural net in Rust
