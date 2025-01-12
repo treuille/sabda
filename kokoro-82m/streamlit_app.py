@@ -121,14 +121,18 @@ def run_onnx_model():
     tokens = [[0, *tokens, 0]]
 
     sess = load_inference_session("kokoro-v0_19.onnx")
+    model_input = {
+        "tokens": tokens,
+        "style": ref_s,
+        "speed": np.ones(1, dtype=np.float32),
+    }
+    st.expander("Model input").write(model_input)
 
-    audio = sess.run(
-        None, dict(tokens=tokens, style=ref_s, speed=np.ones(1, dtype=np.float32))
-    )[0]
+    audio = sess.run(None, model_input)[0]
 
     st.audio(audio, sample_rate=24000)
 
-    st.success("Audio successfully generated!")
+    st.success("Audio successfully generated!!")
 
 
 def main():
