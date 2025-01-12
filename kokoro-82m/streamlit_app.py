@@ -4,7 +4,7 @@ import numpy as np
 
 
 @st.cache_resource
-def build_model(model_path, device):
+def load_pth_model(model_path, device):
     """Wrapping this function so that we don't rebuild models over and over."""
     from models import build_model as _build_model
 
@@ -77,7 +77,7 @@ def run_pth_model():
 
     # TODO: Rename to `model` and `voicepack`
     model_path = "kokoro-v0_19.pth"
-    model = build_model(model_path, device)
+    model = load_pth_model(model_path, device)
     st.success(f"Model loaded successfully `{model_path}`")
     with st.expander("Model details"):
         st.write(model)
