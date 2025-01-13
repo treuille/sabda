@@ -3,6 +3,14 @@ name = "kokoro-rust"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "kokoro"
+path = "src/main.rs"
+
+[[bin]]
+name = "hello"
+path = "src/hello.rs"
+
 [dependencies]
 anyhow = "1.0.95"
 hound = "3.5.1"

@@ -2,18 +2,16 @@
 
 Playground repo to explore AI + realtime sound generation
 
+### Tuesday Demo M2 (looping and effects)
+
+- Loop the synthesis on a beat
+- Add some effects to make it sound cool
+
 ## Todo
-
-### M1 Goal: ONNX playing in Ableton
-
-- Pick a sentence you'd like to hear
-- Compile the sentence into the plugin
-- Run Ableton and have it say waht we want (just once)
 
 ### Steps
 
-- Rust side (just ONNX for now) - **SUCCESS**
-- Rust side -- can I get this to compile to windows
+- Rust side -- can I get this to compile to MacOS
 - Rust side (plug-in)
     - First, create my own sinusoidal (or something else?) plug-in (outside `nih-plug`)
     - Clean up git
