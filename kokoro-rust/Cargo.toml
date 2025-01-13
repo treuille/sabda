@@ -1,5 +1,5 @@
 [package]
-name = "kikoro-rust"
+name = "kokoro-rust"
 version = "0.1.0"
 edition = "2021"
 
