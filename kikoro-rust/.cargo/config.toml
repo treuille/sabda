@@ -1,0 +1,9 @@
+# Adding this so that I can cross compile from Ubutnu on my Apple Silicon Mac.
+[target.aarch64-apple-darwin]
+linker = "./zig-linker.sh"
+rustflags = [
+    "-C", "link-arg=-undefined",
+    "-C", "link-arg=dynamic_lookup",
+    "-C", "debuginfo=0",
+    "-C", "split-debuginfo=off"
+]

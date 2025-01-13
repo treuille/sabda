@@ -12,17 +12,8 @@ Playground repo to explore AI + realtime sound generation
 
 ### Steps
 
-- Rust side (just ONNX for now)
-    - **Goal:** Can I get the neural net loaded as a separate project?
-        - [x] Read through the `ort` documentation
-        - [x] Look through the `ort` examples
-        - [x] Create the separate project
-        - [ ] Get hello world to run
-        - [ ] Get `ort` compiled in
-        - [ ] Can I printf some kind of version information?
-        - [ ] Can I in principle load in that model
-        - [ ] Can I run it quickly
-    - **Goal:** an I output a wav file based on command line arguments?
+- Rust side (just ONNX for now) - **SUCCESS**
+- Rust side -- can I get this to compile to windows
 - Rust side (plug-in)
     - First, create my own sinusoidal (or something else?) plug-in (outside `nih-plug`)
     - Clean up git
