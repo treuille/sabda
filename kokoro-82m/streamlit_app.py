@@ -126,11 +126,32 @@ def run_onnx_model():
         "style": ref_s,
         "speed": np.ones(1, dtype=np.float32),
     }
-    st.expander("Model input").write(model_input)
+    with st.expander("The model input"):
+        for key, value in model_input.items():
+            st.subheader(key)
+            value = np.array(value)
+            st.write(value)
+            st.caption(
+                f"type: `{type(value)}` shape: `{value.shape}` dtype: `{value.dtype}`"
+            )
+        if st.button("Construct this ndarray in rust"):
+            st.code(
+                f"""
+                let tokens = vec![{', '.join(str(t) for t in tokens[0])}];
+                let style = vec![{', '.join(str(s) for s in ref_s[0])}];
+                let speed = vec![1.0];
+                """
+            )
 
     audio = sess.run(None, model_input)[0]
 
     st.audio(audio, sample_rate=24000)
+
+    with st.expander("Audio statistics"):
+        # Min, max, amd mean of the audio
+        st.write("Min:", audio.min())
+        st.write("Max:", audio.max())
+        st.write("Mean:", audio.mean())
 
     st.success("Audio successfully generated!!")
 
