@@ -7,17 +7,34 @@ Playground repo to explore AI + realtime sound generation
 - Loop the synthesis on a beat
 - Add some effects to make it sound cool
 
+#### Examples that I can use
+
+- `Buffr Glitch` - uses incoming midi signal
+- `examples/sine` - just create a sine wave
+- Also look at[Transport](https://github.com/robbert-vdh/nih-plug/blob/master/src/context/process.rs#L104)
+
 ## Todo
 
 ### Steps
 
-- Rust side -- can I get this to compile to MacOS
-- Rust side (plug-in)
+- Background studying (**Goal: Understand how I can put samples into the buffer**)
+    - Ask AI how do to his
+        - Add in all the code files as context. Then ask it to answer this question.
+        - Quetions
+            1. How would I implement a plugin that reads in a large .wav file
+            2. At what point during the plug-in's lifecycle does it make sense to read
+               in suhc such a file (and allocate a whole bunch of memory)
+            3. How do I store state such as which sample I'm on from the perspective of
+               of playing back the sample
+            3. How can I read the clock signal from midi and then play the sample only
+               every four beats.
+        - Ask of
+            - [ ] OpenAI
+            - [ ] Claude
+- Rust side (**Goal: Get a fixed set of samples looping on the beat.**)
     - First, create my own sinusoidal (or something else?) plug-in (outside `nih-plug`)
     - Clean up git
-    - Can I plug in the ONNX runtime into the plugin j
-- Rust side
-    - ???
+- Can I plug in the ONNX runtime into the plugin
 - Combining Rust + Python
     - See if I can get some vectors in there
 - See if I can get Kokoro-82M to play properly
@@ -30,19 +47,14 @@ Playground repo to explore AI + realtime sound generation
 
 ## Vision
 
-### Tuesday Demo M1 (ONNX playing in Ableton)
+### Tuesday Demo M2 (playing a sample + effects)
 
-- Pick a sentence you'd like to hear
-- Compile the sentence into the plugin
-- Run Ableton and have it say waht we want (just once)
-
-### Tuesday Demo M2 (looping and effects)
-
-- Loop the synthesis on a beat
+- See if I can play a sample on the beat
 - Add some effects to make it sound cool
 
 ### Tuesday Demo M3 (showing off the NN in realtime)
 
+- Loop the synthesis on a beat
 - Save to a text file which is read by the plug-in
 - It resynthesizes based on what it sees in that file
 
@@ -85,7 +97,7 @@ cargo build --target aarch64-apple-darwin
 
 # Release mode for M1/M2 Macs (Apple Silicon)
 cargo build --release --target aarch64-apple-darwin
-``catppuccin`
+```
 
 The executable will be in:
 
